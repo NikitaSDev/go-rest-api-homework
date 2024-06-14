@@ -104,7 +104,10 @@ func getTask(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	_, _ = w.Write(resp)
+	_, err = w.Write(resp)
+	if err != nil {
+		fmt.Printf("ошибка возврата ответа: %s\n", err.Error())
+	}
 }
 
 func deleteTask(w http.ResponseWriter, r *http.Request) {
