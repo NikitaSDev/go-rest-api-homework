@@ -56,7 +56,7 @@ func getTasks(w http.ResponseWriter, r *http.Request) {
 	w.Write(resp)
 }
 
-func postTask(w http.ResponseWriter, r *http.Request) {
+func addTask(w http.ResponseWriter, r *http.Request) {
 	var task Task
 	var buf bytes.Buffer
 
@@ -70,6 +70,12 @@ func postTask(w http.ResponseWriter, r *http.Request) {
 	if err = json.Unmarshal(buf.Bytes(), &task); err != nil {
 		fmt.Printf("ошибка десереализации: %s\n", err.Error())
 		http.Error(w, "readibg task error", http.StatusBadRequest)
+		return
+	}
+
+	if _, ok := tasks[task.ID]; ok {
+		fmt.Printf("ошибка создания: задача уже существует")
+		http.Error(w, "task already exist", http.StatusBadRequest)
 		return
 	}
 
@@ -98,7 +104,7 @@ func getTask(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(resp)
+	_, _ = w.Write(resp)
 }
 
 func deleteTask(w http.ResponseWriter, r *http.Request) {
@@ -122,7 +128,7 @@ func main() {
 
 	// здесь регистрируйте ваши обработчики
 	r.Get("/tasks", getTasks)
-	r.Post("/task", postTask)
+	r.Post("/task", addTask)
 	r.Get("/task/{id}", getTask)
 	r.Delete("/task/{id}", deleteTask)
 
